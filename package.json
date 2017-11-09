@@ -1,0 +1,37 @@
+{
+  "name": "paw-patrol-game-for-kids",
+  "version": "0.0.1",
+  "description": "Jogo de fases 2D com temática da Patrulha Canina, destinado ao público infantil (até seis anos). ",
+  "main": "gulpfile.js",
+  "scripts": {
+    "build": "gulp",
+    "test": "gulp lint"
+  },
+  "keywords": [
+    "Jogo",
+    "Patrulha",
+    "Canina",
+    "Paw",
+    "Patrol"
+  ],
+  "author": "Fernando Henriques",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fernandohenriques/paw-patrol-game-for-kids.git"
+  },
+  "dependencies": {
+    "phaser-ce": "^2.9.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babelify": "^8.0.0",
+    "browserify": "^14.5.0",
+    "gulp": "^3.9.1",
+    "gulp-jshint": "^2.0.4",
+    "gulp-uglify": "^3.0.0",
+    "jshint": "^2.9.5",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
