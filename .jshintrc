@@ -1,5 +1,9 @@
 {
   "browser": true,
   "node": true,
-  "esversion": 6
+  "esversion": 6,
+  "globals": {
+    "Phaser": false,
+    "game": false
+  }
 }

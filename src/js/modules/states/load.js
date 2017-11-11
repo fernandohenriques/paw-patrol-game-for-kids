@@ -12,6 +12,6 @@ module.exports = {
     loadDefaultAssets();
   },
   create: function() {
-    setTimeout(function(){ game.state.start('levelOne'); },1000);
+    setTimeout(function(){ game.state.start('levelOne'); },500);
   }
 };

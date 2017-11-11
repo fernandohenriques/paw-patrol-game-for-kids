@@ -8,9 +8,9 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
 
-var allFiles = './src/**/*.js';
-var gameFile = './src/game.js';
-var phaserFile = './src/phaser.js';
+var allFiles = './src/js/**/*.js';
+var gameFile = './src/js/game.js';
+var phaserFile = './src/js/phaser.js';
 
 gulp.task('lint', function() {
   return gulp.src(allFiles).pipe(jshint()).pipe(jshint.reporter('default'));
