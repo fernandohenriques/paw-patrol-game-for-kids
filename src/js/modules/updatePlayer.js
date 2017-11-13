@@ -1,3 +1,4 @@
+//updatePlayer
 module.exports = function(player,cursors,spaceKey){
   player.body.velocity.x = 0;
 

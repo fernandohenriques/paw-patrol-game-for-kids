@@ -10,7 +10,7 @@ var sounds, cursors, spaceKey, platforms, player, bones;
 
 function create() {
   config = defaultConfigLevels();
-  platforms = createPlatforms(levelData.one.platforms);
+  platforms = createPlatforms(levelData.two.platforms);
   player = createPlayer();
   bones = createBones(16);
 
@@ -20,7 +20,7 @@ function create() {
 }
 
 function update() {
-  updateCollisions(bones, platforms, player, sounds, levelData.one);
+  updateCollisions(bones, platforms, player, sounds, levelData.two);
   updatePlayer(player,cursors,spaceKey);
 
 }

@@ -21,7 +21,7 @@
     "url": "https://github.com/fernandohenriques/paw-patrol-game-for-kids.git"
   },
   "dependencies": {
-    "phaser-ce": "^2.9.1"
+    "phaser-ce": "^2.9.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

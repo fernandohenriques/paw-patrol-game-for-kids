@@ -3,26 +3,43 @@
 
 window.game = new Phaser.Game(1067, 600, Phaser.AUTO, 'gameDiv');
 
-game.global = { score: 0 };
+game.global = { score: 0, totalCollectBones: 0 };
 
 game.state.add('boot', require('./modules/states/boot'));
 game.state.add('load', require('./modules/states/load'));
 game.state.add('levelOne', require('./modules/states/levels/01'));
-//game.state.add('end', require('./modules/states/end'));
+game.state.add('levelTwo', require('./modules/states/levels/02'));
+game.state.add('end', require('./modules/states/end'));
 
 game.state.start('boot');
 
-},{"./modules/states/boot":8,"./modules/states/levels/01":9,"./modules/states/load":11}],2:[function(require,module,exports){
+},{"./modules/states/boot":9,"./modules/states/end":10,"./modules/states/levels/01":11,"./modules/states/levels/02":12,"./modules/states/load":14}],2:[function(require,module,exports){
+//checkEndGame
+module.exports = function (quantityCheck, nextLevel, timeClosed = false) {
+  let nextState = false;
+  if (game.global.totalCollectBones == quantityCheck) nextState = nextLevel;else if (timeClosed) nextState = 'end';
+
+  if (nextState) {
+    const go = () => game.state.start(nextState);
+    game.camera.fade('#000', 1500);
+    game.camera.onFadeComplete.add(go);
+  }
+};
+
+},{}],3:[function(require,module,exports){
+const checkEndGame = require('./checkEndGame');
+
 //collectBones
-module.exports = function (player, bone, sfx = false) {
+module.exports = function (player, bone, level, sfx = false) {
   if (sfx) sfx.play();
   bone.kill();
-
+  game.global.totalCollectBones++;
+  checkEndGame(level.totalBonesCheck, level.nextLevel);
   /*score += 10;
   scoreText.text = 'Pontos: ' + score;*/
 };
 
-},{}],3:[function(require,module,exports){
+},{"./checkEndGame":2}],4:[function(require,module,exports){
 //createBones
 module.exports = function (quantity) {
   let bones = game.add.group();
@@ -39,13 +56,17 @@ module.exports = function (quantity) {
   return bones;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 //createPlatforms
 module.exports = function (levelData, hasMovel = 0, posMovel = null) {
   let platforms = game.add.group();
   platforms.enableBody = true;
 
-  for (let key in levelData) platforms.create(levelData[key].x, levelData[key].y, 'platform').body.immovable = true;
+  for (let key in levelData) {
+    let platform = platforms.create(levelData[key].x, levelData[key].y, 'platform');
+    platform.body.immovable = true;
+    if ("scale" in levelData[key]) platform.scale.setTo(levelData[key].scale[0], levelData[key].scale[1]);
+  }
 
   //create Ground
   let ground = platforms.create(0, game.world.height - 57.6, 'platform');
@@ -55,7 +76,7 @@ module.exports = function (levelData, hasMovel = 0, posMovel = null) {
   return platforms;
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function () {
   let player = game.add.sprite(32, game.world.height - 150, 'character');
   player.frame = 1;
@@ -72,7 +93,8 @@ module.exports = function () {
   return player;
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
+//defaultConfigLevels
 module.exports = function () {
   game.add.sprite(0, 0, 'background');
 
@@ -89,7 +111,8 @@ module.exports = function () {
   return { sounds: sounds, cursors: cursors, spaceKey: spaceKey };
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+//loadDefaultAssets
 module.exports = function () {
   //images
   game.load.image('background', 'assets/images/paw_patrol_bg.png');
@@ -105,7 +128,7 @@ module.exports = function () {
   game.load.audio('gameOver', 'assets/sounds/game-over.ogg');
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = {
   preload: function () {
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -116,7 +139,15 @@ module.exports = {
   }
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
+module.exports = {
+  preload: function () {
+    let textGameOver = game.add.text(game.world.centerX, 280, 'GAME OVER', { font: '70px grobold', fill: '#fff' });
+    textGameOver.anchor.set(0.5);
+  }
+};
+
+},{}],11:[function(require,module,exports){
 const levelData = require('./data/elements.json');
 const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
@@ -139,29 +170,63 @@ function create() {
 }
 
 function update() {
-  updateCollisions(bones, platforms, player, sounds);
+  updateCollisions(bones, platforms, player, sounds, levelData.one);
   updatePlayer(player, cursors, spaceKey);
 }
 
 module.exports = { create: create, update: update };
 
-},{"../../createBones":3,"../../createPlatforms":4,"../../createPlayer":5,"../../defaultConfigLevels":6,"../../updateCollisions":12,"../../updatePlayer":13,"./data/elements.json":10}],10:[function(require,module,exports){
+},{"../../createBones":4,"../../createPlatforms":5,"../../createPlayer":6,"../../defaultConfigLevels":7,"../../updateCollisions":15,"../../updatePlayer":16,"./data/elements.json":13}],12:[function(require,module,exports){
+const levelData = require('./data/elements.json');
+const defaultConfigLevels = require('../../defaultConfigLevels');
+const createPlatforms = require('../../createPlatforms');
+const createPlayer = require('../../createPlayer');
+const createBones = require('../../createBones');
+const updateCollisions = require('../../updateCollisions');
+const updatePlayer = require('../../updatePlayer');
+
+var sounds, cursors, spaceKey, platforms, player, bones;
+
+function create() {
+  config = defaultConfigLevels();
+  platforms = createPlatforms(levelData.two.platforms);
+  player = createPlayer();
+  bones = createBones(16);
+
+  sounds = config.sounds;
+  cursors = config.cursors;
+  spaceKey = config.spaceKey;
+}
+
+function update() {
+  updateCollisions(bones, platforms, player, sounds, levelData.two);
+  updatePlayer(player, cursors, spaceKey);
+}
+
+module.exports = { create: create, update: update };
+
+},{"../../createBones":4,"../../createPlatforms":5,"../../createPlayer":6,"../../defaultConfigLevels":7,"../../updateCollisions":15,"../../updatePlayer":16,"./data/elements.json":13}],13:[function(require,module,exports){
 module.exports={
   "one":{
     "platforms":[
       {"x":400,"y":400},
       {"x":-150,"y":250}
-    ]
+    ],
+    "totalBonesCheck": 16,
+    "nextLevel": "levelTwo"
   },
   "two":{
     "platforms":[
-      {"x":500,"y":600},
-      {"x":100,"y":500}
-    ]
+      {"x":303,"y":130,"scale": [0.5,1]},
+      {"x":440,"y":400,"scale": [0.89,1]},
+      {"x":-150,"y":270}
+    ],
+    "totalBonesCheck": 32,
+    "nextLevel": "levelTree"
   },
 }
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 const loadDefaultAssets = require('../loadDefaultAssets');
 
 module.exports = {
@@ -182,12 +247,13 @@ module.exports = {
   }
 };
 
-},{"../loadDefaultAssets":7}],12:[function(require,module,exports){
+},{"../loadDefaultAssets":8}],15:[function(require,module,exports){
 const collectBones = require('./collectBones');
 
-module.exports = function (bones, platforms, player, sounds) {
-  const overlapPlayerBones = function (player, bones) {
-    collectBones(player, bones, sounds.getBoneSfx);
+//updateCollisions
+module.exports = function (bones, platforms, player, sounds, level) {
+  const overlapPlayerBones = function (player, bone) {
+    collectBones(player, bone, level, sounds.getBoneSfx);
   };
 
   game.physics.arcade.collide(bones, platforms);
@@ -195,7 +261,8 @@ module.exports = function (bones, platforms, player, sounds) {
   game.physics.arcade.overlap(player, bones, overlapPlayerBones);
 };
 
-},{"./collectBones":2}],13:[function(require,module,exports){
+},{"./collectBones":3}],16:[function(require,module,exports){
+//updatePlayer
 module.exports = function (player, cursors, spaceKey) {
     player.body.velocity.x = 0;
 

@@ -1,3 +1,4 @@
+//loadDefaultAssets
 module.exports = function(){
   //images
   game.load.image('background', 'assets/images/paw_patrol_bg.png');

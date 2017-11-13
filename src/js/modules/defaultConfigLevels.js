@@ -1,3 +1,4 @@
+//defaultConfigLevels
 module.exports = function() {
   game.add.sprite(0, 0, 'background');
 

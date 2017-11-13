@@ -1,8 +1,9 @@
 const collectBones = require('./collectBones');
 
-module.exports = function(bones, platforms, player, sounds){
-  const overlapPlayerBones = function(player,bones){
-    collectBones(player,bones,sounds.getBoneSfx);
+//updateCollisions
+module.exports = function(bones, platforms, player, sounds, level){
+  const overlapPlayerBones = function(player,bone){
+    collectBones(player,bone,level,sounds.getBoneSfx);
   };
 
   game.physics.arcade.collide(bones, platforms);
