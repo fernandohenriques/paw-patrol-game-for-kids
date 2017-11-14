@@ -13,7 +13,7 @@ game.state.add('end', require('./modules/states/end'));
 
 game.state.start('boot');
 
-},{"./modules/states/boot":9,"./modules/states/end":10,"./modules/states/levels/01":11,"./modules/states/levels/02":12,"./modules/states/load":14}],2:[function(require,module,exports){
+},{"./modules/states/boot":10,"./modules/states/end":11,"./modules/states/levels/01":12,"./modules/states/levels/02":13,"./modules/states/load":15}],2:[function(require,module,exports){
 //checkEndGame
 module.exports = function (quantityCheck, nextLevel, timeClosed = false) {
   let nextState = false;
@@ -21,7 +21,7 @@ module.exports = function (quantityCheck, nextLevel, timeClosed = false) {
 
   if (nextState) {
     const go = () => game.state.start(nextState);
-    game.camera.fade('#000', 1500);
+    game.camera.fade('#000', 800);
     game.camera.onFadeComplete.add(go);
   }
 };
@@ -35,8 +35,6 @@ module.exports = function (player, bone, level, sfx = false) {
   bone.kill();
   game.global.totalCollectBones++;
   checkEndGame(level.totalBonesCheck, level.nextLevel);
-  /*score += 10;
-  scoreText.text = 'Pontos: ' + score;*/
 };
 
 },{"./checkEndGame":2}],4:[function(require,module,exports){
@@ -94,6 +92,22 @@ module.exports = function () {
 };
 
 },{}],7:[function(require,module,exports){
+const checkEndGame = require('./checkEndGame');
+
+//createTimer
+module.exports = function (timer, level) {
+  let txtTimer = game.add.text(game.width - 10, 10, '00:' + timer, { font: '35px grobold', fill: '#fff' });
+  txtTimer.anchor.set(1, 0);
+
+  const updateTime = () => {
+    if (timer > 0) timer--;else if (timer == 0) checkEndGame(level.totalBonesCheck, level.nextLevel, 1);
+    txtTimer.text = '00:' + (timer < 10 ? '0' : '') + timer;
+  };
+
+  return game.time.events.loop(1000, updateTime);
+};
+
+},{"./checkEndGame":2}],8:[function(require,module,exports){
 //defaultConfigLevels
 module.exports = function () {
   game.add.sprite(0, 0, 'background');
@@ -111,7 +125,7 @@ module.exports = function () {
   return { sounds: sounds, cursors: cursors, spaceKey: spaceKey };
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 //loadDefaultAssets
 module.exports = function () {
   //images
@@ -128,7 +142,7 @@ module.exports = function () {
   game.load.audio('gameOver', 'assets/sounds/game-over.ogg');
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = {
   preload: function () {
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -139,30 +153,50 @@ module.exports = {
   }
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = {
   preload: function () {
     let textGameOver = game.add.text(game.world.centerX, 280, 'GAME OVER', { font: '70px grobold', fill: '#fff' });
     textGameOver.anchor.set(0.5);
+  },
+  create: function () {
+    let soundGameOver = game.add.audio('gameOver');
+    soundGameOver.play();
+
+    let txtPressEnter = game.add.text(game.world.centerX, 555, 'PRESS ENTER TO RESTART', { font: '15px emulogic', fill: '#fff' });
+    txtPressEnter.anchor.set(0.5);
+    game.add.tween(txtPressEnter).to({ y: 355 }, 1000).start();
+
+    const txtBlink = () => game.add.tween(txtPressEnter).to({ alpha: 1 }, 700).to({ alpha: 0 }, 700).loop().start();
+    game.time.events.add(1000, txtBlink);
+  },
+  update: function () {
+    const enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+    if (enterKey.isDown) {
+      game.global.totalCollectBones = 0;
+      game.state.start('levelOne'); //for now, later wil go to menu
+    }
   }
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 const levelData = require('./data/elements.json');
 const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
 const createPlayer = require('../../createPlayer');
 const createBones = require('../../createBones');
+const createTimer = require('../../createTimer');
 const updateCollisions = require('../../updateCollisions');
 const updatePlayer = require('../../updatePlayer');
 
-var sounds, cursors, spaceKey, platforms, player, bones;
+var sounds, cursors, spaceKey, platforms, player, bones, clock;
 
 function create() {
   config = defaultConfigLevels();
   platforms = createPlatforms(levelData.one.platforms);
   player = createPlayer();
   bones = createBones(16);
+  clock = createTimer(15, levelData.one);
 
   sounds = config.sounds;
   cursors = config.cursors;
@@ -176,12 +210,13 @@ function update() {
 
 module.exports = { create: create, update: update };
 
-},{"../../createBones":4,"../../createPlatforms":5,"../../createPlayer":6,"../../defaultConfigLevels":7,"../../updateCollisions":15,"../../updatePlayer":16,"./data/elements.json":13}],12:[function(require,module,exports){
+},{"../../createBones":4,"../../createPlatforms":5,"../../createPlayer":6,"../../createTimer":7,"../../defaultConfigLevels":8,"../../updateCollisions":16,"../../updatePlayer":17,"./data/elements.json":14}],13:[function(require,module,exports){
 const levelData = require('./data/elements.json');
 const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
 const createPlayer = require('../../createPlayer');
 const createBones = require('../../createBones');
+const createTimer = require('../../createTimer');
 const updateCollisions = require('../../updateCollisions');
 const updatePlayer = require('../../updatePlayer');
 
@@ -192,6 +227,7 @@ function create() {
   platforms = createPlatforms(levelData.two.platforms);
   player = createPlayer();
   bones = createBones(16);
+  clock = createTimer(14, levelData.two);
 
   sounds = config.sounds;
   cursors = config.cursors;
@@ -205,7 +241,7 @@ function update() {
 
 module.exports = { create: create, update: update };
 
-},{"../../createBones":4,"../../createPlatforms":5,"../../createPlayer":6,"../../defaultConfigLevels":7,"../../updateCollisions":15,"../../updatePlayer":16,"./data/elements.json":13}],13:[function(require,module,exports){
+},{"../../createBones":4,"../../createPlatforms":5,"../../createPlayer":6,"../../createTimer":7,"../../defaultConfigLevels":8,"../../updateCollisions":16,"../../updatePlayer":17,"./data/elements.json":14}],14:[function(require,module,exports){
 module.exports={
   "one":{
     "platforms":[
@@ -226,7 +262,7 @@ module.exports={
   },
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 const loadDefaultAssets = require('../loadDefaultAssets');
 
 module.exports = {
@@ -247,7 +283,7 @@ module.exports = {
   }
 };
 
-},{"../loadDefaultAssets":8}],15:[function(require,module,exports){
+},{"../loadDefaultAssets":9}],16:[function(require,module,exports){
 const collectBones = require('./collectBones');
 
 //updateCollisions
@@ -261,7 +297,7 @@ module.exports = function (bones, platforms, player, sounds, level) {
   game.physics.arcade.overlap(player, bones, overlapPlayerBones);
 };
 
-},{"./collectBones":3}],16:[function(require,module,exports){
+},{"./collectBones":3}],17:[function(require,module,exports){
 //updatePlayer
 module.exports = function (player, cursors, spaceKey) {
     player.body.velocity.x = 0;

@@ -3,6 +3,7 @@ const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
 const createPlayer = require('../../createPlayer');
 const createBones = require('../../createBones');
+const createTimer = require('../../createTimer');
 const updateCollisions = require('../../updateCollisions');
 const updatePlayer = require('../../updatePlayer');
 
@@ -13,6 +14,7 @@ function create() {
   platforms = createPlatforms(levelData.two.platforms);
   player = createPlayer();
   bones = createBones(16);
+  clock = createTimer(14,levelData.two);
 
   sounds = config.sounds;
   cursors = config.cursors;

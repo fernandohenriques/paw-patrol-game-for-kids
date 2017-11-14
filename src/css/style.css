@@ -6,15 +6,23 @@
 body {
 	 background-color: #555;
 }
-@font-face {
-    font-family: grobold;
-    src: url('../assets/fonts/grobold.ttf')
-}
-.fontLoader{
-  font-family: grobold /* Force load font before Phaser */
-}
 #gameDiv {
   width: 1067px;
   height: 600;
   margin: 0 auto
+}
+@font-face {
+    font-family: grobold;
+    src: url('../assets/fonts/grobold.ttf')
+}
+@font-face {
+    font-family: emulogic;
+    src: url('../assets/fonts/emulogic.ttf')
+}
+/* Force load font before Phaser */
+.fontLoaderGrobold{
+  font-family: grobold
+}
+.fontLoaderEmulogic{
+  font-family: emulogic
 }

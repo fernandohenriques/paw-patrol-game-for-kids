@@ -6,7 +6,7 @@ module.exports = function(quantityCheck, nextLevel, timeClosed = false){
 
   if(nextState) {
     const go = () => game.state.start(nextState);
-    game.camera.fade('#000',1500);
+    game.camera.fade('#000',800);
     game.camera.onFadeComplete.add(go);
   }
 };
