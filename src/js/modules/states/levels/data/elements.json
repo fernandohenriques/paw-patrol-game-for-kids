@@ -16,4 +16,13 @@
     "totalBonesCheck": 32,
     "nextLevel": "levelTree"
   },
+  "tree":{
+    "platforms":[
+      {"x":850,"y":450},
+      {"x":335,"y":310},
+      {"x":-150,"y":250}
+    ],
+    "totalBonesCheck": 48,
+    "nextLevel": "levelFour"
+  }
 }
