@@ -17,5 +17,4 @@ module.exports = function(player,cursors,spaceKey){
   } else if (cursors.down.isDown && !player.body.touching.down) {
       player.body.velocity.y = 200;
   }
-
 };
