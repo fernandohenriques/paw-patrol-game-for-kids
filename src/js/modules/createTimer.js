@@ -9,7 +9,8 @@ module.exports = function(timer,level){
     if(timer > 0) timer--;
     else if(timer == 0) checkEndGame(level.totalBonesCheck,level.nextLevel,1);
     txtTimer.text = '00:' + (timer<10?'0':'') + timer;
+    if(game.global.timeLevel != -1) game.global.timeLeve = timer;
   };
 
-  return game.time.events.loop(1000,updateTime);
+  game.time.events.loop(1000,updateTime);
 };

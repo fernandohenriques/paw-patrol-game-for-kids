@@ -3,7 +3,7 @@
 
 window.game = new Phaser.Game(1067, 600, Phaser.AUTO, 'gameDiv');
 
-game.global = { music: {}, score: 0, totalCollectBones: 0 };
+game.global = { music: {}, timeLevel: 0, score: 0, collectedBones: 0 };
 
 game.state.add('boot', require('./modules/states/boot'));
 game.state.add('load', require('./modules/states/load'));
@@ -15,31 +15,44 @@ game.state.add('end', require('./modules/states/end'));
 
 game.state.start('boot');
 
-},{"./modules/states/boot":11,"./modules/states/end":12,"./modules/states/levels/01":13,"./modules/states/levels/02":14,"./modules/states/levels/03":15,"./modules/states/levels/04":16,"./modules/states/load":18}],2:[function(require,module,exports){
+},{"./modules/states/boot":12,"./modules/states/end":13,"./modules/states/levels/01":14,"./modules/states/levels/02":15,"./modules/states/levels/03":16,"./modules/states/levels/04":17,"./modules/states/load":19}],2:[function(require,module,exports){
+//calculateScore
+module.exports = function (isGameOver) {
+    let score = (game.global.timeLevel + 1) * game.global.collectedBones;
+    game.global.score += score;
+    game.global.timeLevel = 0;
+    game.global.collectedBones = 0;
+    if (isGameOver) game.global.timeLevel = -1;
+};
+
+},{}],3:[function(require,module,exports){
+const calculateScore = require('./calculateScore');
+
 //checkEndGame
 module.exports = function (quantityCheck, nextLevel, timeClosed = false) {
   let nextState = false;
-  if (game.global.totalCollectBones == quantityCheck) nextState = nextLevel;else if (timeClosed) nextState = 'end';
+  if (game.global.collectedBones == quantityCheck) nextState = nextLevel;else if (timeClosed) nextState = 'end';
 
   if (nextState) {
+    calculateScore(timeClosed);
     const go = () => game.state.start(nextState);
     game.camera.fade('#000', 800);
     game.camera.onFadeComplete.add(go);
   }
 };
 
-},{}],3:[function(require,module,exports){
+},{"./calculateScore":2}],4:[function(require,module,exports){
 const checkEndGame = require('./checkEndGame');
 
 //collectBones
 module.exports = function (player, bone, level, sfx = false) {
   if (sfx) sfx.play();
   bone.kill();
-  game.global.totalCollectBones++;
+  game.global.collectedBones++;
   checkEndGame(level.totalBonesCheck, level.nextLevel);
 };
 
-},{"./checkEndGame":2}],4:[function(require,module,exports){
+},{"./checkEndGame":3}],5:[function(require,module,exports){
 module.exports = function () {
   let music = game.add.audio('bgSound');
   music.loop = true;
@@ -48,7 +61,7 @@ module.exports = function () {
   return music;
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 //createBones
 module.exports = function (quantity) {
   let bones = game.add.group();
@@ -65,7 +78,7 @@ module.exports = function (quantity) {
   return bones;
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 //createPlatforms
 module.exports = function (levelData, isMovable = 0) {
   let platforms = game.add.group();
@@ -87,7 +100,7 @@ module.exports = function (levelData, isMovable = 0) {
   return platforms;
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports = function () {
   let player = game.add.sprite(32, game.world.height - 150, 'character');
   player.frame = 1;
@@ -104,7 +117,7 @@ module.exports = function () {
   return player;
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const checkEndGame = require('./checkEndGame');
 
 //createTimer
@@ -115,12 +128,13 @@ module.exports = function (timer, level) {
   const updateTime = () => {
     if (timer > 0) timer--;else if (timer == 0) checkEndGame(level.totalBonesCheck, level.nextLevel, 1);
     txtTimer.text = '00:' + (timer < 10 ? '0' : '') + timer;
+    if (game.global.timeLevel != -1) game.global.timeLeve = timer;
   };
 
-  return game.time.events.loop(1000, updateTime);
+  game.time.events.loop(1000, updateTime);
 };
 
-},{"./checkEndGame":2}],9:[function(require,module,exports){
+},{"./checkEndGame":3}],10:[function(require,module,exports){
 //defaultConfigLevels
 module.exports = function () {
   game.add.sprite(0, 0, 'background');
@@ -133,7 +147,7 @@ module.exports = function () {
   return { sounds: sounds, cursors: cursors, spaceKey: spaceKey };
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 //loadDefaultAssets
 module.exports = function () {
   //images
@@ -150,7 +164,7 @@ module.exports = function () {
   game.load.audio('gameOver', 'assets/sounds/game-over.ogg');
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = {
   preload: function () {
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -161,17 +175,26 @@ module.exports = {
   }
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = {
   preload: function () {
     game.global.music.stop();
-    let textGameOver = game.add.text(game.world.centerX, 280, 'GAME OVER', { font: '70px grobold', fill: '#fff' });
+    let mainMsgEnd = 'COMPLETE GAME, CONGRATULATIONS!';
+    let sizeMainMsg = 50;
+    if (game.global.timeLevel == -1) {
+      let soundGameOver = game.add.audio('gameOver');
+      soundGameOver.play();
+      mainMsgEnd = 'GAME OVER';
+      sizeMainMsg = 70;
+    }
+
+    let textGameOver = game.add.text(game.world.centerX, 280, mainMsgEnd, { font: sizeMainMsg + 'px grobold', fill: '#fff' });
     textGameOver.anchor.set(0.5);
+
+    let textScore = game.add.text(game.world.centerX, 150, 'YOUR SCORE: ' + game.global.score, { font: '11.5px emulogic', fill: '#fff' });
+    textScore.anchor.set(0.5);
   },
   create: function () {
-    let soundGameOver = game.add.audio('gameOver');
-    soundGameOver.play();
-
     let txtPressEnter = game.add.text(game.world.centerX, 555, 'PRESS ENTER TO RESTART', { font: '15px emulogic', fill: '#fff' });
     txtPressEnter.anchor.set(0.5);
     game.add.tween(txtPressEnter).to({ y: 355 }, 1000).start();
@@ -182,13 +205,13 @@ module.exports = {
   update: function () {
     const enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
     if (enterKey.isDown) {
-      game.global.totalCollectBones = 0;
+      game.global.timeLevel = 0;
       game.state.start('levelOne'); //for now, later wil go to menu
     }
   }
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 const levelData = require('./data/elements.json');
 const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
@@ -223,7 +246,7 @@ function update() {
 
 module.exports = { create: create, update: update };
 
-},{"../../createBackgroundMusic":4,"../../createBones":5,"../../createPlatforms":6,"../../createPlayer":7,"../../createTimer":8,"../../defaultConfigLevels":9,"../../updateCollisions":19,"../../updatePlayer":20,"./data/elements.json":17}],14:[function(require,module,exports){
+},{"../../createBackgroundMusic":5,"../../createBones":6,"../../createPlatforms":7,"../../createPlayer":8,"../../createTimer":9,"../../defaultConfigLevels":10,"../../updateCollisions":20,"../../updatePlayer":21,"./data/elements.json":18}],15:[function(require,module,exports){
 const levelData = require('./data/elements.json');
 const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
@@ -254,7 +277,7 @@ function update() {
 
 module.exports = { create: create, update: update };
 
-},{"../../createBones":5,"../../createPlatforms":6,"../../createPlayer":7,"../../createTimer":8,"../../defaultConfigLevels":9,"../../updateCollisions":19,"../../updatePlayer":20,"./data/elements.json":17}],15:[function(require,module,exports){
+},{"../../createBones":6,"../../createPlatforms":7,"../../createPlayer":8,"../../createTimer":9,"../../defaultConfigLevels":10,"../../updateCollisions":20,"../../updatePlayer":21,"./data/elements.json":18}],16:[function(require,module,exports){
 const levelData = require('./data/elements.json');
 const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
@@ -285,7 +308,7 @@ function update() {
 
 module.exports = { create: create, update: update };
 
-},{"../../createBones":5,"../../createPlatforms":6,"../../createPlayer":7,"../../createTimer":8,"../../defaultConfigLevels":9,"../../updateCollisions":19,"../../updatePlayer":20,"./data/elements.json":17}],16:[function(require,module,exports){
+},{"../../createBones":6,"../../createPlatforms":7,"../../createPlayer":8,"../../createTimer":9,"../../defaultConfigLevels":10,"../../updateCollisions":20,"../../updatePlayer":21,"./data/elements.json":18}],17:[function(require,module,exports){
 const levelData = require('./data/elements.json');
 const defaultConfigLevels = require('../../defaultConfigLevels');
 const createPlatforms = require('../../createPlatforms');
@@ -324,7 +347,7 @@ function update() {
 
 module.exports = { create: create, update: update };
 
-},{"../../createBones":5,"../../createPlatforms":6,"../../createPlayer":7,"../../createTimer":8,"../../defaultConfigLevels":9,"../../updateCollisions":19,"../../updatePlayer":20,"./data/elements.json":17}],17:[function(require,module,exports){
+},{"../../createBones":6,"../../createPlatforms":7,"../../createPlayer":8,"../../createTimer":9,"../../defaultConfigLevels":10,"../../updateCollisions":20,"../../updatePlayer":21,"./data/elements.json":18}],18:[function(require,module,exports){
 module.exports={
   "one":{
     "platforms":[
@@ -341,7 +364,7 @@ module.exports={
       {"x":-150,"y":270}
     ],
     "totalBonesCheck": 32,
-    "nextLevel": "levelTree"
+    "nextLevel": "end"
   },
   "tree":{
     "platforms":[
@@ -365,7 +388,7 @@ module.exports={
   }
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 const loadDefaultAssets = require('../loadDefaultAssets');
 
 module.exports = {
@@ -386,7 +409,7 @@ module.exports = {
   }
 };
 
-},{"../loadDefaultAssets":10}],19:[function(require,module,exports){
+},{"../loadDefaultAssets":11}],20:[function(require,module,exports){
 const collectBones = require('./collectBones');
 
 //updateCollisions
@@ -408,7 +431,7 @@ module.exports = function (bones, platforms, player, sounds, level, platformsMov
   }
 };
 
-},{"./collectBones":3}],20:[function(require,module,exports){
+},{"./collectBones":4}],21:[function(require,module,exports){
 //updatePlayer
 module.exports = function (player, cursors, spaceKey) {
     player.body.velocity.x = 0;

@@ -4,6 +4,6 @@ const checkEndGame = require('./checkEndGame');
 module.exports = function(player, bone, level, sfx = false){
   if(sfx) sfx.play();
   bone.kill();
-  game.global.totalCollectBones++;
+  game.global.collectedBones++;
   checkEndGame(level.totalBonesCheck,level.nextLevel);
 };
