@@ -28,7 +28,8 @@ gulp.task('phaser', function() {
 });
 
 gulp.task('build', function() {
-  return browserify(gameFile).transform(babelify).bundle().pipe(source('app.js')).pipe(gulp.dest('./public/js'));
+  var bundle = browserify(gameFile).transform(babelify).bundle();
+  return bundle.pipe(source('app.js')).pipe(buffer()).pipe(uglify()).pipe(gulp.dest('./public/js'));
 });
 
 gulp.task('default', ['lint','cssMin','phaser','build']);

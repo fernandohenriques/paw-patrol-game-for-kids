@@ -11,7 +11,7 @@ const updatePlayer = require('../../updatePlayer');
 var sounds, cursors, spaceKey, platforms, player, bones;
 
 function create() {
-  config = defaultConfigLevels();
+  let config = defaultConfigLevels();
   platforms = createPlatforms(levelData.one.platforms);
   player = createPlayer();
   bones = createBones(16);
