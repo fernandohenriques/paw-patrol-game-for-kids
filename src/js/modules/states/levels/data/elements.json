@@ -13,7 +13,7 @@
       {"x":440,"y":400,"scale": [0.89,1]},
       {"x":-150,"y":270}
     ],
-    "totalBonesCheck": 32,
+    "totalBonesCheck": 16,
     "nextLevel": "levelTree"
   },
   "tree":{
@@ -22,7 +22,7 @@
       {"x":335,"y":310},
       {"x":-150,"y":250}
     ],
-    "totalBonesCheck": 48,
+    "totalBonesCheck": 16,
     "nextLevel": "levelFour"
   },
   "four":{
@@ -33,7 +33,7 @@
     "platformsMovable":[
       {"x":850,"y":450}
     ],
-    "totalBonesCheck": 64,
+    "totalBonesCheck": 16,
     "nextLevel": "end"
   }
 }

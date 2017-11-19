@@ -7,7 +7,7 @@ const createTimer = require('../../createTimer');
 const updateCollisions = require('../../updateCollisions');
 const updatePlayer = require('../../updatePlayer');
 
-var sounds, cursors, spaceKey, platforms, player, bones;
+var sounds, cursors, spaceKey, platforms, platformsMovable, player, bones;
 
 function create() {
   let config = defaultConfigLevels();

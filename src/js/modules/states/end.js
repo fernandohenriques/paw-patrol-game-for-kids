@@ -23,11 +23,14 @@ module.exports = {
 
     const txtBlink = () => game.add.tween(txtPressEnter).to({alpha: 1},700).to({alpha: 0},700).loop().start();
     game.time.events.add(1000,txtBlink);
+    console.log(game.global.collectedBones);
   },
   update: function() {
     const enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
     if(enterKey.isDown) {
       game.global.timeLevel = 0;
+      game.global.score = 0;
+      game.global.collectedBones = 0;
       game.state.start('levelOne'); //for now, later wil go to menu
     }
   }
