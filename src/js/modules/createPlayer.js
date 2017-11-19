@@ -5,11 +5,11 @@ module.exports = function() {
   game.physics.arcade.enable(player);
 
   player.body.bounce.y = 0.1;
-  player.body.gravity.y = 150;
+  player.body.gravity.y = 300;
   player.body.collideWorldBounds = true;
 
-  player.animations.add('left', [0], 15, true);
-  player.animations.add('right', [1], 15, true);
+  player.animations.add('left', [0], 10, true);
+  player.animations.add('right', [1], 10, true);
 
   return player;
 };

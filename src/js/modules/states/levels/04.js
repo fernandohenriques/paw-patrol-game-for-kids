@@ -15,7 +15,7 @@ function create() {
   platformsMovable = createPlatforms(levelData.four.platformsMovable,1);
   player = createPlayer();
   bones = createBones(13);
-  createTimer(18,levelData.four);
+  createTimer(15,levelData.four);
 
   sounds = config.sounds;
   cursors = config.cursors;
