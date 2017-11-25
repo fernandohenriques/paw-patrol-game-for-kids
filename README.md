@@ -1,7 +1,7 @@
 # paw-patrol-game-for-kids
 
 
-A simple 2D phase game with "Paw Patrol" theme, aimed at childrens.
+A simple 2D phase game for childrens, with "Paw Patrol" theme.
 
 *************************************************************************************************
 
@@ -14,6 +14,7 @@ Used technologies:
 - HTML 5
 - Javascript (ES6)
 - Phaser
+- NPM
 - Browserify
 - Babel
 - Gulp
